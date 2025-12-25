@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Flag Knock-Out Tournament</title>
+
+<style>
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    margin: 0;
+    padding: 1rem;
+    background: #f4f4f4;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .controls {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .round {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    color: #555;
+  }
+
+  .match {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .flag-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    width: 45%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .flag {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  button {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    background: #222;
+    color: white;
+  }
+
+  button:active {
+    transform: scale(0.97);
+  }
+
+  .winner {
+    margin-top: 2rem;
+  }
+
+  .winner .flag {
+    font-size: 6rem;
+  }
+
+  .ranking {
+    margin-top: 2rem;
+    text-align: left;
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .ranking ol {
+    padding-left: 1.2rem;
+  }
+</style>
+</head>
+
+<body>
+
+<h1>Coolest Country Flag</h1>
+
+<div class="controls">
+  <label>
+    <input type="checkbox" id="toggleNames" checked />
+    Show country names
+  </label>
+</div>
+
+<div class="round" id="roundInfo"></div>
+<div id="app"></div>
+
+<script>
+const flags = [
+  { name:"Afghanistan",emoji:"🇦🇫"},{name:"Albania",emoji:"🇦🇱"},
+  { name:"Algeria",emoji:"🇩🇿"},{name:"Andorra",emoji:"🇦🇩"},
+  { name:"Angola",emoji:"🇦🇴"},{name:"Argentina",emoji:"🇦🇷"},
+  { name:"Armenia",emoji:"🇦🇲"},{name:"Australia",emoji:"🇦🇺"},
+  { name:"Austria",emoji:"🇦🇹"},{name:"Azerbaijan",emoji:"🇦🇿"},
+  { name:"Bahamas",emoji:"🇧🇸"},{name:"Bahrain",emoji:"🇧🇭"},
+  { name:"Bangladesh",emoji:"🇧🇩"},{name:"Belarus",emoji:"🇧🇾"},
+  { name:"Belgium",emoji:"🇧🇪"},{name:"Bolivia",emoji:"🇧🇴"},
+  { name:"Bosnia",emoji:"🇧🇦"},{name:"Botswana",emoji:"🇧🇼"},
+  { name:"Brazil",emoji:"🇧🇷"},{name:"Bulgaria",emoji:"🇧🇬"},
+  { name:"Cambodia",emoji:"🇰🇭"},{name:"Cameroon",emoji:"🇨🇲"},
+  { name:"Canada",emoji:"🇨🇦"},{name:"Chile",emoji:"🇨🇱"},
+  { name:"China",emoji:"🇨🇳"},{name:"Colombia",emoji:"🇨🇴"},
+  { name:"Costa Rica",emoji:"🇨🇷"},{name:"Croatia",emoji:"🇭🇷"},
+  { name:"Cuba",emoji:"🇨🇺"},{name:"Cyprus",emoji:"🇨🇾"},
+  { name:"Czechia",emoji:"🇨🇿"},{name:"Denmark",emoji:"🇩🇰"},
+  { name:"Dominican Republic",emoji:"🇩🇴"},{name:"Ecuador",emoji:"🇪🇨"},
+  { name:"Egypt",emoji:"🇪🇬"},{name:"El Salvador",emoji:"🇸🇻"},
+  { name:"Estonia",emoji:"🇪🇪"},{name:"Ethiopia",emoji:"🇪🇹"},
+  { name:"Finland",emoji:"🇫🇮"},{name:"France",emoji:"🇫🇷"},
+  { name:"Georgia",emoji:"🇬🇪"},{name:"Germany",emoji:"🇩🇪"},
+  { name:"Ghana",emoji:"🇬🇭"},{name:"Greece",emoji:"🇬🇷"},
+  { name:"Guatemala",emoji:"🇬🇹"},{name:"Honduras",emoji:"🇭🇳"},
+  { name:"Hungary",emoji:"🇭🇺"},{name:"Iceland",emoji:"🇮🇸"},
+  { name:"India",emoji:"🇮🇳"},{name:"Indonesia",emoji:"🇮🇩"},
+  { name:"Iran",emoji:"🇮🇷"},{name:"Iraq",emoji:"🇮🇶"},
+  { name:"Ireland",emoji:"🇮🇪"},{name:"Israel",emoji:"🇮🇱"},
+  { name:"Italy",emoji:"🇮🇹"},{name:"Jamaica",emoji:"🇯🇲"},
+  { name:"Japan",emoji:"🇯🇵"},{name:"Jordan",emoji:"🇯🇴"},
+  { name:"Kazakhstan",emoji:"🇰🇿"},{name:"Kenya",emoji:"🇰🇪"},
+  { name:"Kuwait",emoji:"🇰🇼"},{name:"Latvia",emoji:"🇱🇻"},
+  { name:"Lebanon",emoji:"🇱🇧"},{name:"Lithuania",emoji:"🇱🇹"},
+  { name:"Luxembourg",emoji:"🇱🇺"},{name:"Malaysia",emoji:"🇲🇾"},
+  { name:"Mexico",emoji:"🇲🇽"},{name:"Moldova",emoji:"🇲🇩"},
+  { name:"Morocco",emoji:"🇲🇦"},{name:"Netherlands",emoji:"🇳🇱"},
+  { name:"New Zealand",emoji:"🇳🇿"},{name:"Nigeria",emoji:"🇳🇬"},
+  { name:"North Macedonia",emoji:"🇲🇰"},{name:"Norway",emoji:"🇳🇴"},
+  { name:"Oman",emoji:"🇴🇲"},{name:"Pakistan",emoji:"🇵🇰"},
+  { name:"Panama",emoji:"🇵🇦"},{name:"Paraguay",emoji:"🇵🇾"},
+  { name:"Peru",emoji:"🇵🇪"},{name:"Philippines",emoji:"🇵🇭"},
+  { name:"Poland",emoji:"🇵🇱"},{name:"Portugal",emoji:"🇵🇹"},
+  { name:"Qatar",emoji:"🇶🇦"},{name:"Romania",emoji:"🇷🇴"},
+  { name:"Saudi Arabia",emoji:"🇸🇦"},{name:"Serbia",emoji:"🇷🇸"},
+  { name:"Singapore",emoji:"🇸🇬"},{name:"Slovakia",emoji:"🇸🇰"},
+  { name:"Slovenia",emoji:"🇸🇮"},{name:"South Africa",emoji:"🇿🇦"},
+  { name:"South Korea",emoji:"🇰🇷"},{name:"Spain",emoji:"🇪🇸"},
+  { name:"Sweden",emoji:"🇸🇪"},{name:"Switzerland",emoji:"🇨🇭"},
+  { name:"Thailand",emoji:"🇹🇭"},{name:"Tunisia",emoji:"🇹🇳"},
+  { name:"Turkey",emoji:"🇹🇷"},{name:"Ukraine",emoji:"🇺🇦"},
+  { name:"United Arab Emirates",emoji:"🇦🇪"},{name:"United Kingdom",emoji:"🇬🇧"},
+  { name:"United States",emoji:"🇺🇸"},{name:"Uruguay",emoji:"🇺🇾"},
+  { name:"Uzbekistan",emoji:"🇺🇿"},{name:"Venezuela",emoji:"🇻🇪"},
+  { name:"Vietnam",emoji:"🇻🇳"},{name:"Zimbabwe",emoji:"🇿🇼"}
+];
+
+let currentRound = [...flags];
+let nextRound = [];
+let eliminated = [];
+let matchIndex = 0;
+let roundNumber = 1;
+const totalRounds = Math.ceil(Math.log2(flags.length));
+
+function roundLabel(size) {
+  return size === 128 ? "First round" :
+         size === 64  ? "Round of 64" :
+         size === 32  ? "Round of 32" :
+         size === 16  ? "Round of 16" :
+         size === 8   ? "Quarter-finals" :
+         size === 4   ? "Semi-finals" :
+         size === 2   ? "Final" : "";
+}
+
+function renderMatch() {
+  const app = document.getElementById("app");
+  const showNames = document.getElementById("toggleNames").checked;
+
+  document.getElementById("roundInfo").textContent =
+    `${roundLabel(currentRound.length)} — Round ${roundNumber} of ${totalRounds}`;
+
+  if (currentRound.length === 1) {
+    const ranking = [currentRound[0], ...eliminated.reverse()];
+    app.innerHTML = `
+      <div class="winner">
+        <h2>Winner</h2>
+        <div class="flag">${ranking[0].emoji}</div>
+        <p>${ranking[0].name}</p>
+      </div>
+      <div class="ranking">
+        <h3>Final rankings (1–${ranking.length})</h3>
+        <ol>${ranking.map(f => `<li>${f.emoji} ${f.name}</li>`).join("")}</ol>
+      </div>
+    `;
+    return;
+  }
+
+  const a = currentRound[matchIndex];
+  const b = currentRound[matchIndex + 1];
+
+  app.innerHTML = `
+    <div class="match">
+      <div class="flag-card">
+        <div class="flag">${a.emoji}</div>
+        <button onclick="pickWinner(${matchIndex}, ${matchIndex + 1})">
+          ${showNames ? a.name : "Select"}
+        </button>
+      </div>
+      <div class="flag-card">
+        <div class="flag">${b.emoji}</div>
+        <button onclick="pickWinner(${matchIndex + 1}, ${matchIndex})">
+          ${showNames ? b.name : "Select"}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function pickWinner(winnerIndex, loserIndex) {
+  const winner = currentRound[winnerIndex];
+  const loser = currentRound[loserIndex];
+
+  nextRound.push(winner);
+  eliminated.push(loser);
+  matchIndex += 2;
+
+  if (matchIndex >= currentRound.length) {
+    currentRound = nextRound;
+    nextRound = [];
+    matchIndex = 0;
+    roundNumber++;
+  }
+
+  renderMatch();
+}
+
+document.getElementById("toggleNames").addEventListener("change", renderMatch);
+renderMatch();
+</script>
+
+</body>
+</html>
