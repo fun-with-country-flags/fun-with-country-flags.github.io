@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Flag Knock-Out Tournament (128)</title>
+<title>Flag Knock-Out Tournament</title>
 
 <style>
   body {
@@ -163,7 +163,7 @@ let nextRound = [];
 let eliminated = [];
 let matchIndex = 0;
 let roundNumber = 1;
-const totalRounds = Math.log2(flags.length);
+const totalRounds = Math.ceil(Math.log2(flags.length));
 
 function roundLabel(size) {
   return size === 128 ? "First round" :
@@ -191,7 +191,7 @@ function renderMatch() {
         <p>${ranking[0].name}</p>
       </div>
       <div class="ranking">
-        <h3>Final rankings (1–128)</h3>
+        <h3>Final rankings (1–${ranking.length})</h3>
         <ol>${ranking.map(f => `<li>${f.emoji} ${f.name}</li>`).join("")}</ol>
       </div>
     `;
@@ -205,13 +205,13 @@ function renderMatch() {
     <div class="match">
       <div class="flag-card">
         <div class="flag">${a.emoji}</div>
-        <button onclick="pickWinner(${matchIndex})">
+        <button onclick="pickWinner(${matchIndex}, ${matchIndex + 1})">
           ${showNames ? a.name : "Select"}
         </button>
       </div>
       <div class="flag-card">
         <div class="flag">${b.emoji}</div>
-        <button onclick="pickWinner(${matchIndex + 1})">
+        <button onclick="pickWinner(${matchIndex + 1}, ${matchIndex})">
           ${showNames ? b.name : "Select"}
         </button>
       </div>
@@ -219,9 +219,9 @@ function renderMatch() {
   `;
 }
 
-function pickWinner(index) {
-  const winner = currentRound[index];
-  const loser = currentRound[index ^ 1];
+function pickWinner(winnerIndex, loserIndex) {
+  const winner = currentRound[winnerIndex];
+  const loser = currentRound[loserIndex];
 
   nextRound.push(winner);
   eliminated.push(loser);
