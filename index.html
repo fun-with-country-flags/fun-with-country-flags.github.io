@@ -244,6 +244,7 @@ function renderMatch() {
   if (currentRound.length === 1) {
     document.getElementById("roundInfo").textContent = "Tournament Complete";
     const ranking = [currentRound[0], ...eliminated.reverse()];
+    const top5 = ranking.slice(0, 5);
     app.innerHTML = `
       <div class="winner">
         <h2>Winner</h2>
@@ -251,8 +252,8 @@ function renderMatch() {
         <p>${ranking[0].name}</p>
       </div>
       <div class="ranking">
-        <h3>Final rankings (1–${ranking.length})</h3>
-        <ol>${ranking.map(f => `<li>${renderFlag(f)} ${f.name}</li>`).join("")}</ol>
+        <h3>Your Top 5</h3>
+        <ol>${top5.map(f => `<li>${renderFlag(f)} ${f.name}</li>`).join("")}</ol>
       </div>
     `;
     return;
