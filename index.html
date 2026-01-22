@@ -241,10 +241,8 @@ function renderMatch() {
   const app = document.getElementById("app");
   const showNames = document.getElementById("toggleNames").checked;
 
-  document.getElementById("roundInfo").textContent =
-    `${roundLabel(currentRound.length)} — Round ${roundNumber} of ${totalRounds}`;
-
   if (currentRound.length === 1) {
+    document.getElementById("roundInfo").textContent = "Tournament Complete";
     const ranking = [currentRound[0], ...eliminated.reverse()];
     app.innerHTML = `
       <div class="winner">
@@ -259,6 +257,20 @@ function renderMatch() {
     `;
     return;
   }
+
+  // Handle bye: if only one flag left unpaired, auto-advance it
+  if (matchIndex >= currentRound.length - 1 && currentRound.length % 2 === 1) {
+    nextRound.push(currentRound[matchIndex]);
+    currentRound = nextRound;
+    nextRound = [];
+    matchIndex = 0;
+    roundNumber++;
+    renderMatch();
+    return;
+  }
+
+  document.getElementById("roundInfo").textContent =
+    `${roundLabel(currentRound.length)} — Round ${roundNumber} of ${totalRounds}`;
 
   const a = currentRound[matchIndex];
   const b = currentRound[matchIndex + 1];
