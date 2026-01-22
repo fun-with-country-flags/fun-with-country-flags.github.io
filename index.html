@@ -270,9 +270,11 @@ function updateProgressBar() {
 function renderMatch() {
   const app = document.getElementById("app");
   const showNames = document.getElementById("toggleNames").checked;
+  const controls = document.querySelector(".controls");
 
   if (currentRound.length === 1) {
     document.getElementById("roundInfo").textContent = "Tournament Complete";
+    controls.style.display = "none";
     const ranking = [currentRound[0], ...eliminated.reverse()];
     const top5 = ranking.slice(0, 5);
     app.innerHTML = `
