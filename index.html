@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Flag Knock-Out Tournament</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
 
 <style>
   body {
@@ -112,6 +113,24 @@
     font-size: 0.8rem;
     color: #888;
   }
+
+  .progress-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 1rem;
+    background: #ddd;
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 4px;
+  }
 </style>
 </head>
 
@@ -127,6 +146,9 @@
 </div>
 
 <div class="round" id="roundInfo"></div>
+<div class="progress-container">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
 <div id="app"></div>
 
 <script>
@@ -223,6 +245,9 @@ let eliminated = [];
 let matchIndex = 0;
 let roundNumber = 1;
 const totalRounds = Math.ceil(Math.log2(flags.length));
+// Total matches in the entire tournament = n - 1 (single elimination)
+const totalMatchesInTournament = flags.length - 1;
+let completedMatches = 0;
 
 // Start preloading on Windows
 preloadFlags();
@@ -235,6 +260,11 @@ function roundLabel(size) {
          size === 8   ? "Quarter-finals" :
          size === 4   ? "Semi-finals" :
          size === 2   ? "Final" : "";
+}
+
+function updateProgressBar() {
+  const percentage = (completedMatches / totalMatchesInTournament) * 100;
+  document.getElementById("progressBar").style.width = percentage + "%";
 }
 
 function renderMatch() {
@@ -273,6 +303,8 @@ function renderMatch() {
   document.getElementById("roundInfo").textContent =
     `${roundLabel(currentRound.length)} — Round ${roundNumber} of ${totalRounds}`;
 
+  updateProgressBar();
+
   const a = currentRound[matchIndex];
   const b = currentRound[matchIndex + 1];
 
@@ -302,6 +334,7 @@ function pickWinner(winnerIndex, loserIndex) {
   nextRound.push(winner);
   eliminated.push(loser);
   matchIndex += 2;
+  completedMatches++;
 
   if (matchIndex >= currentRound.length) {
     currentRound = nextRound;
