@@ -109,19 +109,96 @@ button:active {
 }
 
 .progress-container {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto 1rem;
-  background: #ddd;
-  height: 8px;
-  border-radius: 4px;
-  overflow: hidden;
+  display: none;
 }
 
 .progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #4CAF50, #45a049);
-  width: 0%;
-  transition: width 0.3s ease;
-  border-radius: 4px;
+  display: none;
+}
+
+/* Tournament Bracket */
+.bracket-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 1.5rem auto 0;
+  padding: 0.75rem;
+  background: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.bracket {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bracket-round {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bracket-round-header {
+  font-size: 0.6rem;
+  color: #888;
+  font-weight: 600;
+  width: 24px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.bracket-matches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.bracket-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ddd;
+}
+
+.bracket-dot.completed {
+  background: #4CAF50;
+}
+
+.bracket-dot.current {
+  background: #2196F3;
+  animation: pulse-dot 1s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.8; }
+}
+
+.bracket-winner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.bracket-winner-label {
+  font-size: 0.6rem;
+  color: #888;
+  font-weight: 600;
+  width: 24px;
+  text-align: right;
+}
+
+.bracket-winner-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ddd;
+}
+
+.bracket-winner-dot.champion {
+  background: #ff9800;
 }
