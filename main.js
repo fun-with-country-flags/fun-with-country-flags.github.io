@@ -95,8 +95,82 @@ const totalRounds = Math.ceil(Math.log2(flags.length));
 const totalMatchesInTournament = flags.length - 1;
 let completedMatches = 0;
 
+// Calculate matches per round based on actual tournament structure
+function getMatchesPerRound() {
+  const rounds = [];
+  let remaining = flags.length;
+  while (remaining > 1) {
+    const matches = Math.floor(remaining / 2);
+    rounds.push(matches);
+    remaining = Math.ceil(remaining / 2);
+  }
+  return rounds;
+}
+
+const matchesPerRound = getMatchesPerRound();
+const totalRoundsCount = matchesPerRound.length;
+
 // Start preloading on Windows
 preloadFlags();
+
+function renderBracket() {
+  const container = document.getElementById('bracket');
+  if (!container) return;
+  
+  let html = '';
+  const roundLabels = ['R1', 'R2', 'R3', 'R4', 'QF', 'SF', 'F'];
+  
+  // Calculate which round we're in and how many completed in current round
+  let matchesSoFar = 0;
+  let currentRoundIndex = 0;
+  let completedInCurrentRound = completedMatches;
+  
+  for (let r = 0; r < matchesPerRound.length; r++) {
+    if (completedMatches >= matchesSoFar + matchesPerRound[r]) {
+      matchesSoFar += matchesPerRound[r];
+      currentRoundIndex = r + 1;
+      completedInCurrentRound = completedMatches - matchesSoFar;
+    } else {
+      completedInCurrentRound = completedMatches - matchesSoFar;
+      currentRoundIndex = r;
+      break;
+    }
+  }
+  
+  matchesSoFar = 0;
+  for (let r = 0; r < matchesPerRound.length; r++) {
+    const matchCount = matchesPerRound[r];
+    const label = roundLabels[r] || `R${r + 1}`;
+    
+    html += `<div class="bracket-round">`;
+    html += `<div class="bracket-round-header">${label}</div>`;
+    html += `<div class="bracket-matches">`;
+    
+    for (let m = 0; m < matchCount; m++) {
+      const globalMatchIndex = matchesSoFar + m;
+      const isCompleted = globalMatchIndex < completedMatches;
+      const isCurrent = globalMatchIndex === completedMatches && currentRound.length > 1;
+      
+      let dotClass = 'bracket-dot';
+      if (isCompleted) dotClass += ' completed';
+      else if (isCurrent) dotClass += ' current';
+      
+      html += `<div class="${dotClass}"></div>`;
+    }
+    
+    html += `</div></div>`;
+    matchesSoFar += matchCount;
+  }
+  
+  // Add winner indicator
+  const isComplete = currentRound.length === 1;
+  html += `<div class="bracket-winner">`;
+  html += `<div class="bracket-winner-label">🏆</div>`;
+  html += `<div class="bracket-winner-dot${isComplete ? ' champion' : ''}"></div>`;
+  html += `</div>`;
+  
+  container.innerHTML = html;
+}
 
 function roundLabel(size) {
   return size === 128 ? "First round" :
@@ -109,8 +183,7 @@ function roundLabel(size) {
 }
 
 function updateProgressBar() {
-  const percentage = (completedMatches / totalMatchesInTournament) * 100;
-  document.getElementById("progressBar").style.width = percentage + "%";
+  // Progress bar removed - using bracket visualization instead
 }
 
 function renderMatch() {
@@ -118,8 +191,10 @@ function renderMatch() {
   const showNames = document.getElementById("toggleNames").checked;
   const controls = document.querySelector(".controls");
 
+  // Render bracket
+  renderBracket();
+
   if (currentRound.length === 1) {
-    document.getElementById("roundInfo").textContent = "Tournament Complete";
     controls.style.display = "none";
     const ranking = [currentRound[0], ...eliminated.reverse()];
     const top5 = ranking.slice(0, 5);
@@ -147,11 +222,6 @@ function renderMatch() {
     renderMatch();
     return;
   }
-
-  document.getElementById("roundInfo").textContent =
-    `${roundLabel(currentRound.length)} — Round ${roundNumber} of ${totalRounds}`;
-
-  updateProgressBar();
 
   const a = currentRound[matchIndex];
   const b = currentRound[matchIndex + 1];
