@@ -1,3 +1,23 @@
+// Dark mode
+(function initDarkMode() {
+  const toggle = document.getElementById('darkModeToggle');
+  const saved = localStorage.getItem('darkMode');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const isDark = saved === 'true' || (saved === null && prefersDark);
+
+  if (isDark) {
+    document.body.classList.add('dark');
+    toggle.textContent = '🌙';
+  }
+
+  toggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    const dark = document.body.classList.contains('dark');
+    toggle.textContent = dark ? '🌙' : '☀️';
+    localStorage.setItem('darkMode', dark);
+  });
+})();
+
 const flags = [
   { name:"Afghanistan",emoji:"🇦🇫",code:"af"},{name:"Albania",emoji:"🇦🇱",code:"al"},
   { name:"Algeria",emoji:"🇩🇿",code:"dz"},{name:"Andorra",emoji:"🇦🇩",code:"ad"},

@@ -3,10 +3,36 @@ body {
   margin: 0;
   padding: 1rem;
   background: #f4f4f4;
+  color: #111;
   text-align: center;
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  transition: background 0.3s, color 0.3s;
+}
+
+/* Dark mode toggle */
+.dark-mode-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #e0e0e0;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 100;
+  transition: background 0.3s;
+}
+
+.dark-mode-toggle:hover {
+  background: #ccc;
 }
 
 h1 {
@@ -201,4 +227,66 @@ button:active {
 
 .bracket-winner-dot.champion {
   background: #ff9800;
+}
+
+/* Dark mode */
+body.dark {
+  background: #1a1a2e;
+  color: #e0e0e0;
+}
+
+body.dark .dark-mode-toggle {
+  background: #2a2a4a;
+}
+
+body.dark .dark-mode-toggle:hover {
+  background: #3a3a5a;
+}
+
+body.dark .round {
+  color: #aaa;
+}
+
+body.dark .flag-card {
+  background: #16213e;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+body.dark button {
+  background: #e0e0e0;
+  color: #1a1a2e;
+}
+
+body.dark .ranking {
+  background: #16213e;
+}
+
+body.dark .keyboard-hint {
+  color: #777;
+}
+
+body.dark .bracket-container {
+  background: #16213e;
+  border-color: #2a2a4a;
+}
+
+body.dark .bracket-dot {
+  background: #2a2a4a;
+}
+
+body.dark .bracket-round-header,
+body.dark .bracket-winner-label {
+  color: #777;
+}
+
+body.dark .bracket-winner-dot {
+  background: #2a2a4a;
+}
+
+body.dark .bracket-winner .bracket-winner-dot {
+  border-top-color: #2a2a4a;
+}
+
+body.dark .bracket-winner {
+  border-top-color: #2a2a4a;
 }
