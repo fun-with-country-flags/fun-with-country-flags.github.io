@@ -96,6 +96,7 @@ button:active {
   background: white;
   padding: 1rem;
   border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .ranking ol {
@@ -122,9 +123,9 @@ button:active {
   max-width: 600px;
   margin: 1.5rem auto 0;
   padding: 0.75rem;
-  background: #fafafa;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .bracket {
