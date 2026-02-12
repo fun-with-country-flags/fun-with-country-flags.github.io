@@ -429,6 +429,9 @@ function renderMatch() {
     // Submit tournament result to API and fetch leaderboard
     submitTournamentResult(ranking[0].code);
 
+    // Launch confetti celebration!
+    launchConfetti();
+
     return;
   }
 
@@ -454,6 +457,7 @@ function renderMatch() {
           ${showNames ? a.name : "Select"}
         </button>
       </div>
+      <div class="vs-badge">VS</div>
       <div class="flag-card">
         <div class="flag">${renderFlag(b)}</div>
         <button onclick="pickWinner(${matchIndex + 1}, ${matchIndex})">
@@ -549,6 +553,65 @@ renderMatch();
     }
   });
 })();
+
+// Confetti celebration for tournament completion
+function launchConfetti() {
+  const canvas = document.createElement('canvas');
+  canvas.id = 'confetti-canvas';
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ['#a855f7', '#ec4899', '#f59e0b', '#06b6d4', '#22c55e', '#ffffff'];
+  const particles = [];
+
+  for (let i = 0; i < 120; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      w: Math.random() * 10 + 4,
+      h: Math.random() * 6 + 2,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vy: Math.random() * 3 + 2,
+      vx: (Math.random() - 0.5) * 2,
+      rot: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 8,
+      opacity: 1
+    });
+  }
+
+  let frame = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    frame++;
+    let alive = false;
+
+    particles.forEach(p => {
+      if (p.opacity <= 0) return;
+      alive = true;
+      p.y += p.vy;
+      p.x += p.vx;
+      p.rot += p.rotSpeed;
+      if (frame > 90) p.opacity -= 0.015;
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rot * Math.PI) / 180);
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      ctx.restore();
+    });
+
+    if (alive && frame < 200) {
+      requestAnimationFrame(animate);
+    } else {
+      canvas.remove();
+    }
+  }
+  requestAnimationFrame(animate);
+}
 
 // Always fetch and display the global leaderboard
 fetchLeaderboard();
