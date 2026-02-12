@@ -558,17 +558,22 @@ body.dark .vote-count {
   height: 24px;
   border-radius: 50%;
   border: none;
-  background: transparent;
-  font-size: 1rem;
+  background: #e0e0e0;
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
   padding: 0;
-  opacity: 0.5;
-  transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
   z-index: 10;
+  font-style: normal;
 }
 
 .bracket-legend-toggle:hover {
-  opacity: 1;
+  background: #ccc;
+  transform: scale(1.1);
 }
 
 .bracket-legend-toggle.pulse {
@@ -715,6 +720,15 @@ body.dark .progress-info {
 
 body.dark .bracket-legend {
   border-bottom-color: #2a2a4a;
+}
+
+body.dark .bracket-legend-toggle {
+  background: #2a2a4a;
+  color: #e0e0e0;
+}
+
+body.dark .bracket-legend-toggle:hover {
+  background: #3a3a5a;
 }
 
 body.dark .results-divider,
