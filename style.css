@@ -275,6 +275,14 @@ body.dark .bracket-dot {
   background: #2a2a4a;
 }
 
+body.dark .bracket-dot.completed {
+  background: #4CAF50;
+}
+
+body.dark .bracket-dot.current {
+  background: #2196F3;
+}
+
 body.dark .bracket-round-header,
 body.dark .bracket-winner-label {
   color: #777;

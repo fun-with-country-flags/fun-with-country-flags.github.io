@@ -247,7 +247,7 @@ preloadFlags();
 function renderBracket() {
   const container = document.getElementById('bracket');
   if (!container) return;
-  
+
   let html = '';
   const roundLabels = ['R1', 'R2', 'R3', 'R4', 'QF', 'SF', 'F'];
   
@@ -281,11 +281,11 @@ function renderBracket() {
       const globalMatchIndex = matchesSoFar + m;
       const isCompleted = globalMatchIndex < completedMatches;
       const isCurrent = globalMatchIndex === completedMatches && currentRound.length > 1;
-      
+
       let dotClass = 'bracket-dot';
       if (isCompleted) dotClass += ' completed';
       else if (isCurrent) dotClass += ' current';
-      
+
       html += `<div class="${dotClass}"></div>`;
     }
     
