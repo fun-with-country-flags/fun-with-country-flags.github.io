@@ -13,3 +13,30 @@ The app was built with following steps:
 - Deploy the app on github pages. Use the mobile website for this, not the github app as that does not habe all needed functionality.
 
 All in all, this was a funny little project to see what simple app you can build with AI in 10 minutes from your phone.
+
+## Setting up backend for global flag leaderboard
+
+This site collects every winning flag, and keeps track of most popular flags in a global leaderboard. The backend is setup with Cloudflare Workers + D1.
+
+### Create a new workers project
+
+```
+wrangler init flag-tournament-api
+```
+
+Choose Hello World, worker only.
+
+### Setup D1 database
+
+```
+wrangler d1 create flag-votes-db
+```
+
+Copy output to the `wrangler.jsonc` file.
+
+### Run DB migration file
+
+```
+cd flag-tournament-api
+wrangler d1 execute flag-votes-db --file=./schema.sql
+```
