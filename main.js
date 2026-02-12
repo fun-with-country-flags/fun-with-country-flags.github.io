@@ -18,6 +18,117 @@
   });
 })();
 
+// API Configuration
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8787'
+  : 'https://flag-tournament-api.martijnhollestelle.workers.dev';
+
+// Session Management
+function getOrCreateSessionId() {
+  let sessionId = localStorage.getItem('tournament-session-id');
+  if (!sessionId) {
+    // Use crypto.randomUUID() if available, otherwise fallback
+    if (crypto && crypto.randomUUID) {
+      sessionId = crypto.randomUUID();
+    } else {
+      // Fallback UUID v4 generation
+      sessionId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0;
+        const v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+    try {
+      localStorage.setItem('tournament-session-id', sessionId);
+    } catch (e) {
+      // localStorage might be disabled
+      console.warn('Could not save session ID to localStorage:', e);
+    }
+  }
+  return sessionId;
+}
+
+const sessionId = getOrCreateSessionId();
+
+// API Client Functions
+async function submitTournamentResult(winnerCode) {
+  // Check if already submitted
+  if (localStorage.getItem('tournament-submitted')) {
+    console.log('Tournament already submitted for this session');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/vote`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        flagCode: winnerCode,
+        sessionId: sessionId
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Vote submitted successfully:', data);
+      try {
+        localStorage.setItem('tournament-submitted', 'true');
+      } catch (e) {
+        console.warn('Could not save submission status:', e);
+      }
+      // Fetch and display leaderboard
+      fetchLeaderboard();
+    } else {
+      const error = await response.json();
+      console.error('Failed to submit vote:', error);
+    }
+  } catch (error) {
+    console.error('Error submitting vote:', error);
+    // Fail silently - don't block user experience
+  }
+}
+
+async function fetchLeaderboard(limit = 10) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/leaderboard?limit=${limit}`);
+    if (response.ok) {
+      const data = await response.json();
+      displayLeaderboard(data.leaderboard, data.totalVotes);
+    } else {
+      console.error('Failed to fetch leaderboard:', await response.text());
+    }
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
+    // Fail silently
+  }
+}
+
+function displayLeaderboard(leaderboard, totalVotes) {
+  const container = document.getElementById('leaderboard');
+
+  container.innerHTML = `
+    <div class="global-leaderboard">
+      <h3>Global Leaderboard</h3>
+      <div class="leaderboard-stats">
+        <p>Based on <span class="total-votes">${totalVotes.toLocaleString()}</span> votes worldwide</p>
+      </div>
+      <ol class="leaderboard-list">
+        ${leaderboard.map(item => `
+          <li>
+            <span class="flag-info">
+              <span class="flag-emoji">${item.emoji}</span>
+              <span class="flag-name">${item.flagName}</span>
+            </span>
+            <span class="vote-count">${item.voteCount.toLocaleString()} votes</span>
+          </li>
+        `).join('')}
+      </ol>
+    </div>
+  `;
+}
+
 const flags = [
   { name:"Afghanistan",emoji:"🇦🇫",code:"af"},{name:"Albania",emoji:"🇦🇱",code:"al"},
   { name:"Algeria",emoji:"🇩🇿",code:"dz"},{name:"Andorra",emoji:"🇦🇩",code:"ad"},
@@ -136,7 +247,7 @@ preloadFlags();
 function renderBracket() {
   const container = document.getElementById('bracket');
   if (!container) return;
-  
+
   let html = '';
   const roundLabels = ['R1', 'R2', 'R3', 'R4', 'QF', 'SF', 'F'];
   
@@ -170,11 +281,11 @@ function renderBracket() {
       const globalMatchIndex = matchesSoFar + m;
       const isCompleted = globalMatchIndex < completedMatches;
       const isCurrent = globalMatchIndex === completedMatches && currentRound.length > 1;
-      
+
       let dotClass = 'bracket-dot';
       if (isCompleted) dotClass += ' completed';
       else if (isCurrent) dotClass += ' current';
-      
+
       html += `<div class="${dotClass}"></div>`;
     }
     
@@ -229,6 +340,10 @@ function renderMatch() {
         <ol>${top5.map(f => `<li>${renderFlag(f)} ${f.name}</li>`).join("")}</ol>
       </div>
     `;
+
+    // Submit tournament result to API and fetch leaderboard
+    submitTournamentResult(ranking[0].code);
+
     return;
   }
 
@@ -297,3 +412,6 @@ document.addEventListener("keydown", function(e) {
 });
 
 renderMatch();
+
+// Always fetch and display the global leaderboard
+fetchLeaderboard();

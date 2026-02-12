@@ -275,6 +275,14 @@ body.dark .bracket-dot {
   background: #2a2a4a;
 }
 
+body.dark .bracket-dot.completed {
+  background: #4CAF50;
+}
+
+body.dark .bracket-dot.current {
+  background: #2196F3;
+}
+
 body.dark .bracket-round-header,
 body.dark .bracket-winner-label {
   color: #777;
@@ -290,4 +298,83 @@ body.dark .bracket-winner .bracket-winner-dot {
 
 body.dark .bracket-winner {
   border-top-color: #2a2a4a;
+}
+
+/* Global Leaderboard */
+.global-leaderboard {
+  margin-top: 2rem;
+  text-align: left;
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.global-leaderboard h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.leaderboard-stats {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.leaderboard-stats .total-votes {
+  font-weight: 600;
+}
+
+.leaderboard-list {
+  padding-left: 1.2rem;
+  margin: 0;
+}
+
+.leaderboard-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.leaderboard-list li:last-child {
+  border-bottom: none;
+}
+
+.flag-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.flag-emoji {
+  font-size: 1.2rem;
+}
+
+.flag-name {
+  font-weight: 500;
+}
+
+.vote-count {
+  font-size: 0.85rem;
+  color: #888;
+  white-space: nowrap;
+}
+
+/* Dark mode for leaderboard */
+body.dark .global-leaderboard {
+  background: #16213e;
+}
+
+body.dark .leaderboard-stats {
+  color: #aaa;
+}
+
+body.dark .leaderboard-list li {
+  border-bottom-color: #2a2a4a;
+}
+
+body.dark .vote-count {
+  color: #777;
 }
