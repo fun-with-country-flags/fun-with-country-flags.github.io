@@ -378,3 +378,346 @@ body.dark .leaderboard-list li {
 body.dark .vote-count {
   color: #777;
 }
+
+/* Progress Info */
+.progress-info {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.round-label {
+  font-weight: 600;
+  color: #2196F3;
+}
+
+/* Welcome Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  animation: slideUp 0.3s ease-out;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  color: #999;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.modal-close:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.modal-close:active {
+  transform: scale(0.95);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.modal-subtitle {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.modal-features {
+  text-align: left;
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+
+.modal-features li {
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.modal-features li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #2196F3;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.modal-btn {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1.1rem;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.modal-btn:hover {
+  background: #1976D2;
+}
+
+.learn-more-link {
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: #666;
+  text-decoration: none;
+}
+
+.learn-more-link:hover {
+  text-decoration: underline;
+}
+
+/* Help button */
+.help-toggle {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: #e0e0e0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  z-index: 100;
+  transition: background 0.3s;
+}
+
+.help-toggle:hover {
+  background: #ccc;
+}
+
+/* Bracket Legend */
+.bracket-container {
+  position: relative;
+}
+
+.bracket-legend-toggle {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0.5;
+  transition: opacity 0.3s;
+  z-index: 10;
+}
+
+.bracket-legend-toggle:hover {
+  opacity: 1;
+}
+
+.bracket-legend-toggle.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.bracket-legend {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  text-align: left;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.bracket-legend.expanded {
+  max-height: 200px;
+}
+
+.bracket-legend h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.8rem;
+}
+
+.bracket-legend ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bracket-legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-dot.gray { background: #ddd; }
+.legend-dot.blue { background: #2196F3; }
+.legend-dot.green { background: #4CAF50; }
+.legend-dot.orange { background: #ff9800; }
+
+/* Play Again Button */
+.play-again-btn {
+  margin-top: 1.5rem;
+  padding: 0.75rem 2rem;
+  font-size: 1rem;
+  background: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.play-again-btn:hover {
+  background: #1976D2;
+}
+
+/* Results Section Improvements */
+.results-divider {
+  margin: 3rem 0 1rem 0;
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.ranking-context {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+/* Dark mode additions */
+body.dark .modal-content {
+  background: #16213e;
+  color: #e0e0e0;
+}
+
+body.dark .modal-close {
+  color: #777;
+}
+
+body.dark .modal-close:hover {
+  background: #2a2a4a;
+  color: #e0e0e0;
+}
+
+body.dark .modal-subtitle {
+  color: #aaa;
+}
+
+body.dark .modal-features li::before {
+  color: #2196F3;
+}
+
+body.dark .learn-more-link {
+  color: #aaa;
+}
+
+body.dark .help-toggle {
+  background: #2a2a4a;
+}
+
+body.dark .help-toggle:hover {
+  background: #3a3a5a;
+}
+
+body.dark .progress-info {
+  color: #aaa;
+}
+
+body.dark .bracket-legend {
+  border-bottom-color: #2a2a4a;
+}
+
+body.dark .results-divider,
+body.dark .ranking-context {
+  color: #aaa;
+}

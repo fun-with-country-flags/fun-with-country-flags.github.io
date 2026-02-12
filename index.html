@@ -11,8 +11,14 @@
 <body>
 
 <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">☀️</button>
+<button id="helpToggle" class="help-toggle" aria-label="Show help">?</button>
 
 <h1>Coolest Country Flag</h1>
+
+<div id="progressInfo" class="progress-info">
+  <span id="matchCounter">Match 1 of 127</span>
+  <span id="roundLabel" class="round-label"></span>
+</div>
 
 <div class="controls">
   <label>
@@ -23,9 +29,35 @@
 
 <div id="app"></div>
 <div class="bracket-container" id="bracketContainer">
+  <button id="bracketLegendToggle" class="bracket-legend-toggle" aria-label="Toggle legend">ℹ️</button>
+  <div id="bracketLegend" class="bracket-legend">
+    <h4>Tournament Progress</h4>
+    <ul>
+      <li><span class="legend-dot gray"></span> Upcoming matches</li>
+      <li><span class="legend-dot blue"></span> Current match</li>
+      <li><span class="legend-dot green"></span> Completed matches</li>
+      <li><span class="legend-dot orange"></span> Tournament winner</li>
+    </ul>
+  </div>
   <div class="bracket" id="bracket"></div>
 </div>
 <div id="leaderboard"></div>
+
+<div id="welcomeModal" class="modal-overlay">
+  <div class="modal-content">
+    <button id="closeModal" class="modal-close" aria-label="Close">&times;</button>
+    <h2>Which flag is coolest?</h2>
+    <p class="modal-subtitle">A single-elimination tournament to find your #1</p>
+    <ul class="modal-features">
+      <li>Pick between two flags at a time</li>
+      <li>Your favorite advances, the other is eliminated</li>
+      <li>Play ~127 matches to crown your champion</li>
+    </ul>
+    <button id="startTournament" class="modal-btn">Start Tournament</button>
+    <a href="#" id="learnMore" class="learn-more-link">Learn more about how this works</a>
+  </div>
+</div>
+
 <script src="./main.js" defer></script>
 
 </body>
