@@ -92,6 +92,185 @@ h1 {
   letter-spacing: 0.01em;
 }
 
+/* ---------- Floating emoji background ---------- */
+.floating-emojis {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.floating-emoji {
+  position: absolute;
+  font-size: 1.6rem;
+  opacity: 0;
+  animation: floatUp linear forwards;
+  pointer-events: none;
+  filter: saturate(0.7);
+}
+
+body.dark .floating-emoji {
+  filter: saturate(0.5) brightness(0.8);
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(0deg) scale(0.6);
+  }
+  10% {
+    opacity: 0.35;
+  }
+  90% {
+    opacity: 0.25;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-100vh) rotate(360deg) scale(1);
+  }
+}
+
+/* ---------- FIGHT flash overlay ---------- */
+.fight-flash {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+}
+
+.fight-flash.active {
+  animation: fightFlashAnim 0.6s ease-out forwards;
+}
+
+.fight-flash-text {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 4rem;
+  font-weight: 700;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  letter-spacing: 0.05em;
+}
+
+@keyframes fightFlashAnim {
+  0% {
+    opacity: 0;
+    transform: scale(3);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+/* ---------- Streak bar ---------- */
+.streak-bar {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.35rem 1rem;
+  border-radius: 100px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  background: var(--bg-card);
+  border: var(--card-border);
+  color: var(--text-primary);
+  transition: all 0.3s;
+}
+
+.streak-bar.hidden {
+  display: none;
+}
+
+.streak-bar.fire {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(236, 72, 153, 0.15));
+  border-color: rgba(245, 158, 11, 0.3);
+  animation: streakPulse 0.8s ease-in-out infinite alternate;
+}
+
+.streak-bar.mega {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.2), rgba(245, 158, 11, 0.2));
+  border-color: rgba(168, 85, 247, 0.4);
+  animation: streakPulse 0.5s ease-in-out infinite alternate, streakRainbow 3s linear infinite;
+}
+
+@keyframes streakPulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.03); }
+}
+
+@keyframes streakRainbow {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+/* ---------- Match commentary ---------- */
+.match-commentary {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  min-height: 1.3em;
+  transition: opacity 0.3s;
+  font-style: italic;
+}
+
+/* ---------- Click sparkles ---------- */
+.sparkle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 800;
+  font-size: 1.2rem;
+  animation: sparkleAnim 0.7s ease-out forwards;
+}
+
+@keyframes sparkleAnim {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--sx), var(--sy)) scale(0.3) rotate(180deg);
+  }
+}
+
+/* ---------- Screen shake on pick ---------- */
+@keyframes screenShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px) rotate(-0.5deg); }
+  40% { transform: translateX(3px) rotate(0.5deg); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+
+body.shake {
+  animation: screenShake 0.3s ease-out;
+}
+
 /* ---------- Dark mode toggle ---------- */
 .dark-mode-toggle {
   position: fixed;
@@ -257,29 +436,63 @@ h1 {
   opacity: 1;
 }
 
+/* ---------- Animated gradient border on cards ---------- */
+.flag-card::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: calc(var(--radius-lg) + 2px);
+  background: conic-gradient(from var(--card-angle, 0deg), #a855f7, #ec4899, #f59e0b, #06b6d4, #a855f7);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.4s;
+  animation: rotateBorder 4s linear infinite;
+}
+
+.flag-card:hover::after {
+  opacity: 0.5;
+}
+
+@property --card-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes rotateBorder {
+  to { --card-angle: 360deg; }
+}
+
 /* VS divider (added via JS) */
 .vs-badge {
   display: flex;
   align-items: center;
   justify-content: center;
   align-self: center;
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: var(--accent-gradient);
   color: white;
   font-family: 'Fredoka', sans-serif;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 1rem;
   flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.3);
-  animation: vsPulse 2s ease-in-out infinite;
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4), 0 0 40px rgba(236, 72, 153, 0.15);
+  animation: vsPulse 2s ease-in-out infinite, vsGlow 3s ease-in-out infinite;
   z-index: 2;
+  position: relative;
 }
 
 @keyframes vsPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.12) rotate(-3deg); }
+  75% { transform: scale(1.08) rotate(3deg); }
+}
+
+@keyframes vsGlow {
+  0%, 100% { box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4), 0 0 30px rgba(236, 72, 153, 0.1); }
+  50% { box-shadow: 0 4px 30px rgba(168, 85, 247, 0.6), 0 0 50px rgba(236, 72, 153, 0.25); }
 }
 
 /* ---------- Flag emoji / image ---------- */
@@ -361,36 +574,88 @@ button:active {
 .winner {
   margin-top: 2rem;
   animation: winnerReveal 0.8s ease-out;
+  position: relative;
 }
 
 @keyframes winnerReveal {
-  0% { transform: scale(0.6); opacity: 0; }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); opacity: 1; }
+  0% { transform: scale(0.3) rotate(-10deg); opacity: 0; }
+  40% { transform: scale(1.1) rotate(2deg); }
+  60% { transform: scale(0.95) rotate(-1deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
 .winner h2 {
   font-family: 'Fredoka', sans-serif;
-  font-size: 1.8rem;
+  font-size: 2rem;
   background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: winnerTextShimmer 3s ease-in-out infinite;
+  background-size: 200% auto;
+}
+
+@keyframes winnerTextShimmer {
+  0%, 100% { background-position: 0% center; }
+  50% { background-position: 200% center; }
 }
 
 .winner .flag {
-  font-size: 7rem;
-  min-height: 120px;
-  animation: winnerBounce 1s ease-in-out infinite alternate;
+  font-size: 8rem;
+  min-height: 130px;
+  animation: winnerBounce 1.5s ease-in-out infinite alternate;
+  position: relative;
 }
 
 @keyframes winnerBounce {
-  0% { transform: translateY(0) rotate(-2deg); }
-  100% { transform: translateY(-8px) rotate(2deg); }
+  0% { transform: translateY(0) rotate(-3deg) scale(1); }
+  100% { transform: translateY(-12px) rotate(3deg) scale(1.05); }
 }
 
 .winner .flag img {
   width: 160px;
+}
+
+.winner p {
+  font-family: 'Fredoka', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+/* Orbiting emoji ring around winner */
+.winner-orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  margin-top: -100px;
+  margin-left: -100px;
+  pointer-events: none;
+  animation: orbitSpin 8s linear infinite;
+}
+
+.orbit-emoji {
+  position: absolute;
+  font-size: 1.5rem;
+  animation: orbitBob 2s ease-in-out infinite alternate;
+}
+
+.orbit-emoji:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); animation-delay: 0s; }
+.orbit-emoji:nth-child(2) { top: 50%; right: 0; transform: translateY(-50%); animation-delay: 0.3s; }
+.orbit-emoji:nth-child(3) { bottom: 0; left: 50%; transform: translateX(-50%); animation-delay: 0.6s; }
+.orbit-emoji:nth-child(4) { top: 50%; left: 0; transform: translateY(-50%); animation-delay: 0.9s; }
+.orbit-emoji:nth-child(5) { top: 15%; right: 10%; animation-delay: 1.2s; }
+.orbit-emoji:nth-child(6) { bottom: 15%; left: 10%; animation-delay: 1.5s; }
+
+@keyframes orbitSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orbitBob {
+  from { transform: translateY(0) scale(1); }
+  to { transform: translateY(-6px) scale(1.15); }
 }
 
 /* ---------- Ranking ---------- */
@@ -1123,4 +1388,19 @@ body.dark .ranking-context {
   .modal-content { padding: 2rem 1.25rem; }
   .modal-content h2 { font-size: 1.5rem; }
   .winner .flag { font-size: 5rem; }
+  .fight-flash-text { font-size: 2.5rem; }
+  .winner-orbit { width: 140px; height: 140px; margin-top: -70px; margin-left: -70px; }
+  .orbit-emoji { font-size: 1.1rem; }
+  .floating-emoji { font-size: 1.2rem; }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .floating-emojis { display: none; }
+  .fight-flash { display: none; }
 }
