@@ -106,10 +106,9 @@ async function fetchLeaderboard(limit = 10) {
 }
 
 function displayLeaderboard(leaderboard, totalVotes) {
-  const app = document.getElementById('app');
+  const container = document.getElementById('leaderboard');
 
-  // Create leaderboard HTML
-  const leaderboardHTML = `
+  container.innerHTML = `
     <div class="global-leaderboard">
       <h3>Global Leaderboard</h3>
       <div class="leaderboard-stats">
@@ -128,9 +127,6 @@ function displayLeaderboard(leaderboard, totalVotes) {
       </ol>
     </div>
   `;
-
-  // Append to app
-  app.insertAdjacentHTML('beforeend', leaderboardHTML);
 }
 
 const flags = [
@@ -416,3 +412,6 @@ document.addEventListener("keydown", function(e) {
 });
 
 renderMatch();
+
+// Always fetch and display the global leaderboard
+fetchLeaderboard();
