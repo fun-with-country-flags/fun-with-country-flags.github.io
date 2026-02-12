@@ -18,6 +18,45 @@
   });
 })();
 
+// Welcome modal
+(function initWelcome() {
+  const modal = document.getElementById('welcomeModal');
+  const startBtn = document.getElementById('startTournament');
+  const closeBtn = document.getElementById('closeModal');
+  const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
+
+  if (hasSeenWelcome) {
+    modal.classList.add('hidden');
+  }
+
+  function closeModal() {
+    modal.classList.add('hidden');
+    localStorage.setItem('hasSeenWelcome', 'true');
+  }
+
+  startBtn.addEventListener('click', closeModal);
+  closeBtn.addEventListener('click', closeModal);
+
+  // ESC key to close
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+      closeModal();
+    }
+  });
+
+  // Learn more link
+  const learnMore = document.getElementById('learnMore');
+  learnMore.addEventListener('click', (e) => {
+    e.preventDefault();
+    alert('Single-elimination tournament: Each match, one flag advances and one is eliminated. Continue until only one flag remains!');
+  });
+})();
+
+// Help button
+document.getElementById('helpToggle').addEventListener('click', () => {
+  document.getElementById('welcomeModal').classList.remove('hidden');
+});
+
 // API Configuration
 const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:8787'
@@ -241,6 +280,15 @@ function getMatchesPerRound() {
 const matchesPerRound = getMatchesPerRound();
 const totalRoundsCount = matchesPerRound.length;
 
+// Update welcome modal with correct match count
+(function updateWelcomeModalMatchCount() {
+  const modal = document.getElementById('welcomeModal');
+  const matchCountText = modal.querySelector('.modal-features li:last-child');
+  if (matchCountText) {
+    matchCountText.textContent = `Play ${totalMatchesInTournament} matches to crown your champion`;
+  }
+})();
+
 // Start preloading on Windows
 preloadFlags();
 
@@ -317,6 +365,30 @@ function updateProgressBar() {
   // Progress bar removed - using bracket visualization instead
 }
 
+function updateProgressInfo() {
+  const counter = document.getElementById('matchCounter');
+  const label = document.getElementById('roundLabel');
+
+  if (!counter) return;
+
+  const currentMatch = completedMatches + 1;
+  counter.textContent = `Match ${currentMatch} of ${totalMatchesInTournament}`;
+
+  // Add round labels for key rounds
+  const remaining = currentRound.length;
+  if (remaining === 2) {
+    label.textContent = '• Final Match!';
+  } else if (remaining === 4) {
+    label.textContent = '• Semi-finals';
+  } else if (remaining === 8) {
+    label.textContent = '• Quarter-finals';
+  } else if (remaining === 16) {
+    label.textContent = '• Round of 16';
+  } else {
+    label.textContent = '';
+  }
+}
+
 function renderMatch() {
   const app = document.getElementById("app");
   const showNames = document.getElementById("toggleNames").checked;
@@ -325,19 +397,32 @@ function renderMatch() {
   // Render bracket
   renderBracket();
 
+  // Update progress info
+  updateProgressInfo();
+
   if (currentRound.length === 1) {
     controls.style.display = "none";
     const ranking = [currentRound[0], ...eliminated.reverse()];
     const top5 = ranking.slice(0, 5);
     app.innerHTML = `
       <div class="winner">
-        <h2>Winner</h2>
+        <h2>🏆 Tournament Complete!</h2>
         <div class="flag">${renderFlag(ranking[0], 'large')}</div>
         <p>${ranking[0].name}</p>
       </div>
       <div class="ranking">
-        <h3>Your Top 5</h3>
-        <ol>${top5.map(f => `<li>${renderFlag(f)} ${f.name}</li>`).join("")}</ol>
+        <h3>Your Top 5 Rankings</h3>
+        <p class="ranking-context">Based on how far each flag advanced in the tournament</p>
+        <ol>${top5.map((f, i) => {
+          let suffix = '';
+          if (i === 0) suffix = ' - Champion';
+          else if (i === 1) suffix = ' - Finalist';
+          return `<li>${renderFlag(f)} ${f.name}${suffix}</li>`;
+        }).join("")}</ol>
+        <button class="play-again-btn" onclick="playAgain()">Start New Tournament</button>
+      </div>
+      <div class="results-divider">
+        <h3>See How the World Voted</h3>
       </div>
     `;
 
@@ -411,7 +496,59 @@ document.addEventListener("keydown", function(e) {
   }
 });
 
+function playAgain() {
+  // Reset state
+  currentRound = [...flags];
+  nextRound = [];
+  eliminated = [];
+  matchIndex = 0;
+  roundNumber = 1;
+  completedMatches = 0;
+
+  // Clear submission flag to allow new vote
+  localStorage.removeItem('tournament-submitted');
+
+  // Optional: shuffle flags for variety
+  for (let i = currentRound.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [currentRound[i], currentRound[j]] = [currentRound[j], currentRound[i]];
+  }
+
+  // Show controls again
+  document.querySelector(".controls").style.display = "block";
+
+  // Clear leaderboard
+  document.getElementById('leaderboard').innerHTML = '';
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+
+  // Re-render
+  renderMatch();
+}
+
 renderMatch();
+
+// Bracket legend toggle (initialized after completedMatches is defined)
+(function initBracketLegend() {
+  const toggle = document.getElementById('bracketLegendToggle');
+  const legend = document.getElementById('bracketLegend');
+  const showedLegend = localStorage.getItem('showedBracketLegend');
+
+  // Show legend by default for first 3 matches
+  if (!showedLegend && completedMatches < 3) {
+    legend.classList.add('expanded');
+    toggle.classList.add('pulse');
+  }
+
+  toggle.addEventListener('click', () => {
+    legend.classList.toggle('expanded');
+    toggle.classList.remove('pulse');
+    if (legend.classList.contains('expanded')) {
+      localStorage.setItem('showedBracketLegend', 'true');
+    }
+  });
+})();
 
 // Always fetch and display the global leaderboard
 fetchLeaderboard();
