@@ -4,16 +4,29 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Flag Knock-Out Tournament</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏆</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="./style.css" />
 </head>
 
 <body>
 
+<!-- Floating emoji background -->
+<div id="floatingEmojis" class="floating-emojis" aria-hidden="true"></div>
+
+<!-- FIGHT flash overlay -->
+<div id="fightFlash" class="fight-flash" aria-hidden="true"></div>
+
 <button id="darkModeToggle" class="dark-mode-toggle" aria-label="Toggle dark mode">☀️</button>
 <button id="helpToggle" class="help-toggle" aria-label="Show help">?</button>
 
 <h1>Coolest Country Flag</h1>
+<p class="subtitle">Which flag reigns supreme? You decide!</p>
+
+<div id="streakBar" class="streak-bar hidden" aria-live="polite"></div>
+
+<div id="matchCommentary" class="match-commentary" aria-live="polite"></div>
 
 <div id="progressInfo" class="progress-info">
   <span id="matchCounter">Match 1 of 127</span>

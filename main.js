@@ -402,12 +402,26 @@ function renderMatch() {
 
   if (currentRound.length === 1) {
     controls.style.display = "none";
+    // Hide streak and commentary for results
+    const streakEl = document.getElementById('streakBar');
+    if (streakEl) streakEl.classList.add('hidden');
+    const commEl = document.getElementById('matchCommentary');
+    if (commEl) commEl.textContent = '';
+
     const ranking = [currentRound[0], ...eliminated.reverse()];
     const top5 = ranking.slice(0, 5);
     app.innerHTML = `
       <div class="winner">
         <h2>🏆 Tournament Complete!</h2>
         <div class="flag">${renderFlag(ranking[0], 'large')}</div>
+        <div class="winner-orbit">
+          <span class="orbit-emoji">🏆</span>
+          <span class="orbit-emoji">⭐</span>
+          <span class="orbit-emoji">🎉</span>
+          <span class="orbit-emoji">🌍</span>
+          <span class="orbit-emoji">🏅</span>
+          <span class="orbit-emoji">✨</span>
+        </div>
         <p>${ranking[0].name}</p>
       </div>
       <div class="ranking">
@@ -428,6 +442,9 @@ function renderMatch() {
 
     // Submit tournament result to API and fetch leaderboard
     submitTournamentResult(ranking[0].code);
+
+    // Launch confetti celebration!
+    launchConfetti();
 
     return;
   }
@@ -454,6 +471,7 @@ function renderMatch() {
           ${showNames ? a.name : "Select"}
         </button>
       </div>
+      <div class="vs-badge">VS</div>
       <div class="flag-card">
         <div class="flag">${renderFlag(b)}</div>
         <button onclick="pickWinner(${matchIndex + 1}, ${matchIndex})">
@@ -463,11 +481,31 @@ function renderMatch() {
     </div>
     <p class="keyboard-hint">Press, or use ← → arrow keys to select</p>
   `;
+
+  // Show FIGHT flash every few matches for drama (not on the first match)
+  if (completedMatches > 0 && completedMatches % 3 === 0) {
+    showFightFlash();
+  }
+
+  // Show fun match commentary
+  showCommentary();
 }
 
-function pickWinner(winnerIndex, loserIndex) {
+function pickWinner(winnerIndex, loserIndex, event) {
   const winner = currentRound[winnerIndex];
   const loser = currentRound[loserIndex];
+
+  // Fun effects!
+  screenShake();
+  updateStreakBar();
+
+  // Sparkles at the click location or center of the winning card
+  const cards = document.querySelectorAll('.flag-card');
+  const winCard = winnerIndex < loserIndex ? cards[0] : cards[1];
+  if (winCard) {
+    const rect = winCard.getBoundingClientRect();
+    spawnSparkles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+  }
 
   nextRound.push(winner);
   eliminated.push(loser);
@@ -504,6 +542,9 @@ function playAgain() {
   matchIndex = 0;
   roundNumber = 1;
   completedMatches = 0;
+
+  // Reset fun elements
+  resetStreak();
 
   // Clear submission flag to allow new vote
   localStorage.removeItem('tournament-submitted');
@@ -549,6 +590,252 @@ renderMatch();
     }
   });
 })();
+
+// ===== FUN ELEMENTS =====
+
+// --- Floating emoji background ---
+(function initFloatingEmojis() {
+  const container = document.getElementById('floatingEmojis');
+  if (!container) return;
+  const emojis = ['🌍', '🌎', '🌏', '🏳️', '🏴', '🚩', '🎌', '⭐', '✨', '🌟', '💫', '🎪', '🎭', '🏆', '⚔️', '🎯', '🎊', '🎉', '🌈', '🗺️'];
+
+  function spawnEmoji() {
+    const el = document.createElement('span');
+    el.className = 'floating-emoji';
+    el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    el.style.left = (Math.random() * 100) + '%';
+    el.style.bottom = '-2rem';
+    el.style.animationDuration = (12 + Math.random() * 18) + 's';
+    el.style.animationDelay = (Math.random() * 2) + 's';
+    el.style.fontSize = (1 + Math.random() * 1.2) + 'rem';
+    container.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+
+  // Spawn a few immediately
+  for (let i = 0; i < 6; i++) setTimeout(() => spawnEmoji(), i * 400);
+  // Then keep spawning
+  setInterval(spawnEmoji, 3000);
+})();
+
+// --- FIGHT flash ---
+const fightWords = ['FIGHT!', 'BATTLE!', 'CHOOSE!', 'PICK!', 'GO!', 'DUEL!'];
+
+function showFightFlash() {
+  const el = document.getElementById('fightFlash');
+  if (!el) return;
+  const word = fightWords[Math.floor(Math.random() * fightWords.length)];
+  el.innerHTML = `<span class="fight-flash-text">${word}</span>`;
+  el.classList.remove('active');
+  // Force reflow
+  void el.offsetWidth;
+  el.classList.add('active');
+  setTimeout(() => el.classList.remove('active'), 700);
+}
+
+// --- Streak counter ---
+let currentStreak = 0;
+const streakMessages = [
+  { min: 3, emoji: '🔥', text: 'streak', cls: 'fire' },
+  { min: 7, emoji: '🔥🔥', text: 'on fire!', cls: 'fire' },
+  { min: 12, emoji: '💥🔥💥', text: 'UNSTOPPABLE!', cls: 'mega' },
+  { min: 20, emoji: '🌋🔥🌋', text: 'LEGENDARY!!!', cls: 'mega' },
+];
+
+function updateStreakBar() {
+  const bar = document.getElementById('streakBar');
+  if (!bar) return;
+  currentStreak++;
+
+  // Find the highest matching streak tier
+  let msg = null;
+  for (let i = streakMessages.length - 1; i >= 0; i--) {
+    if (currentStreak >= streakMessages[i].min) {
+      msg = streakMessages[i];
+      break;
+    }
+  }
+
+  if (msg) {
+    bar.classList.remove('hidden', 'fire', 'mega');
+    bar.classList.add(msg.cls);
+    bar.innerHTML = `${msg.emoji} ${currentStreak} ${msg.text}`;
+  } else {
+    bar.classList.add('hidden');
+  }
+}
+
+function resetStreak() {
+  currentStreak = 0;
+  const bar = document.getElementById('streakBar');
+  if (bar) bar.classList.add('hidden');
+}
+
+// --- Match commentary ---
+const commentaryLines = [
+  "Tough call! 🤔", "This is a classic matchup!", "The crowd goes wild! 📣",
+  "A real nail-biter!", "Both flags looking sharp! ✂️", "The tension is palpable...",
+  "Choose wisely! 🧙", "No wrong answers... or are there? 👀",
+  "This could go either way!", "The flags are ready! 🏁",
+  "Legendary showdown! ⚡", "Who will advance?",
+  "Two flags enter, one flag leaves!", "The stakes are getting higher! 📈",
+  "What a moment! 🎬", "Flag fans are on the edge of their seats!",
+  "This match is ELECTRIC! ⚡", "Heart vs. head time! 🧠❤️",
+];
+
+function showCommentary() {
+  const el = document.getElementById('matchCommentary');
+  if (!el) return;
+  el.style.opacity = '0';
+  setTimeout(() => {
+    el.textContent = commentaryLines[Math.floor(Math.random() * commentaryLines.length)];
+    el.style.opacity = '1';
+  }, 150);
+}
+
+// --- Click sparkles ---
+function spawnSparkles(x, y) {
+  const sparkleEmojis = ['✨', '⭐', '💫', '🌟', '⚡', '🎉'];
+  for (let i = 0; i < 6; i++) {
+    const el = document.createElement('span');
+    el.className = 'sparkle';
+    el.textContent = sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+    const angle = (Math.PI * 2 * i) / 6 + (Math.random() - 0.5);
+    const dist = 40 + Math.random() * 60;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    el.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
+    el.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
+    el.style.fontSize = (0.8 + Math.random() * 0.8) + 'rem';
+    document.body.appendChild(el);
+    el.addEventListener('animationend', () => el.remove());
+  }
+}
+
+// --- Screen shake ---
+function screenShake() {
+  document.body.classList.add('shake');
+  setTimeout(() => document.body.classList.remove('shake'), 300);
+}
+
+// Confetti celebration for tournament completion
+function launchConfetti() {
+  const canvas = document.createElement('canvas');
+  canvas.id = 'confetti-canvas';
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const colors = ['#a855f7', '#ec4899', '#f59e0b', '#06b6d4', '#22c55e', '#fff', '#ff6b6b', '#ffd93d'];
+  const particles = [];
+
+  function burst(count, originX, originY, spread) {
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * Math.random());
+      const speed = 2 + Math.random() * 5;
+      particles.push({
+        x: originX + (Math.random() - 0.5) * spread,
+        y: originY + (Math.random() - 0.5) * spread * 0.5,
+        w: Math.random() * 12 + 3,
+        h: Math.random() * 8 + 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vy: -speed * Math.sin(angle) * 0.6 + 1,
+        vx: speed * Math.cos(angle),
+        rot: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 12,
+        opacity: 1,
+        gravity: 0.06 + Math.random() * 0.04,
+        shape: Math.random() > 0.7 ? 'circle' : 'rect'
+      });
+    }
+  }
+
+  // Initial big burst from center
+  burst(80, canvas.width / 2, canvas.height / 3, canvas.width * 0.6);
+  // Side bursts
+  setTimeout(() => burst(50, canvas.width * 0.2, canvas.height * 0.3, 200), 200);
+  setTimeout(() => burst(50, canvas.width * 0.8, canvas.height * 0.3, 200), 400);
+  // Top rain
+  setTimeout(() => {
+    for (let i = 0; i < 60; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: -20 - Math.random() * 200,
+        w: Math.random() * 10 + 3,
+        h: Math.random() * 6 + 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vy: 2 + Math.random() * 3,
+        vx: (Math.random() - 0.5) * 1.5,
+        rot: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 8,
+        opacity: 1,
+        gravity: 0.02,
+        shape: Math.random() > 0.5 ? 'circle' : 'rect'
+      });
+    }
+  }, 600);
+
+  let frame = 0;
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    frame++;
+    let alive = false;
+
+    particles.forEach(p => {
+      if (p.opacity <= 0) return;
+      alive = true;
+      p.vy += (p.gravity || 0.05);
+      p.y += p.vy;
+      p.x += p.vx;
+      p.vx *= 0.99;
+      p.rot += p.rotSpeed;
+      if (frame > 120) p.opacity -= 0.012;
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rot * Math.PI) / 180);
+      ctx.globalAlpha = Math.max(0, p.opacity);
+      ctx.fillStyle = p.color;
+      if (p.shape === 'circle') {
+        ctx.beginPath();
+        ctx.arc(0, 0, p.w / 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+      }
+      ctx.restore();
+    });
+
+    if (alive && frame < 300) {
+      requestAnimationFrame(animate);
+    } else {
+      canvas.remove();
+    }
+  }
+  requestAnimationFrame(animate);
+
+  // Also spawn emoji sparkles from corners
+  const celebEmoji = ['🎉', '🎊', '🏆', '⭐', '🌟', '✨', '🥇', '🎆', '🌍', '🏅'];
+  for (let i = 0; i < 20; i++) {
+    setTimeout(() => {
+      const x = Math.random() * window.innerWidth;
+      const y = Math.random() * window.innerHeight * 0.5;
+      const el = document.createElement('span');
+      el.className = 'sparkle';
+      el.textContent = celebEmoji[Math.floor(Math.random() * celebEmoji.length)];
+      el.style.left = x + 'px';
+      el.style.top = y + 'px';
+      el.style.fontSize = (1.2 + Math.random() * 1.5) + 'rem';
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 60 + Math.random() * 100;
+      el.style.setProperty('--sx', Math.cos(angle) * dist + 'px');
+      el.style.setProperty('--sy', Math.sin(angle) * dist + 'px');
+      document.body.appendChild(el);
+      el.addEventListener('animationend', () => el.remove());
+    }, i * 100);
+  }
+}
 
 // Always fetch and display the global leaderboard
 fetchLeaderboard();
