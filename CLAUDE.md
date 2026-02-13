@@ -1,22 +1,32 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Overview
 
-A static single-page web app that runs a single-elimination knock-out tournament to determine the user's favorite country flag. Deployed via GitHub Pages at fun-with-country-flags.github.io.
+Single-page flag knockout tournament deployed at fun-with-country-flags.github.io. Frontend on GitHub Pages, backend on Cloudflare Workers + D1.
 
-## Development
+## Frontend (`/`)
 
-No build tools, bundler, or package manager. The app is plain HTML/CSS/JS — open `index.html` directly in a browser to run it.
+Plain HTML/CSS/JS — no build step, no dependencies.
 
-## Architecture
+- **index.html** — Shell with controls, progress bar, `#app` mount point, welcome modal, dark mode toggle.
+- **main.js** — All app logic: 113-country `flags` array, tournament engine (single-elimination with bye handling), match rendering, arrow-key navigation, session management (UUID v4 in localStorage), API integration, Windows flag-emoji fallback via flagcdn.com PNGs.
+- **style.css** — Responsive layout (max-width 840px), Fredoka/Nunito fonts, glassmorphic cards, animated gradient background, dark mode.
 
-- **index.html** — Page shell: title, controls (show/hide country names toggle), progress bar container, and `#app` mount point.
-- **main.js** — All application logic in a single file:
-  - `flags` array (100+ countries, each with `name`, `emoji`, and two-letter `code`).
-  - Windows OS detection: on Windows (which doesn't render flag emojis), flags are loaded as `<img>` from `flagcdn.com`; on other platforms native emoji is used.
-  - Tournament engine: single-elimination bracket with bye handling for odd counts. State is held in module-level variables (`currentRound`, `nextRound`, `eliminated`, `matchIndex`, `roundNumber`).
-  - `renderMatch()` drives the UI — shows two flags per match, or the final results (winner + top 5 ranking) when complete.
-  - Arrow key navigation (left/right) as alternative to button clicks.
-- **style.css** — Responsive layout, max-width 800px, card-based match display, progress bar styling.
+Run locally by opening `index.html` in a browser.
+
+## Backend (`/flag-tournament-api`)
+
+Cloudflare Workers + D1 (SQLite). TypeScript, tested with Vitest.
+
+- `src/index.ts` — Router: `POST /api/vote`, `GET /api/leaderboard`, CORS preflight.
+- `src/handlers/vote.ts` — Validates flag code + session ID, inserts vote, prevents duplicates.
+- `src/handlers/leaderboard.ts` — Aggregates votes, returns ranked list (default 10, max 50). 60s cache.
+- `src/utils/` — CORS (allows GitHub Pages + localhost + file://), flag validation, request validation.
+- `schema.sql` — `votes` table with indexes on `flag_code` and `timestamp`.
+
+```bash
+cd flag-tournament-api
+npm run dev      # local dev on :8787
+npm run test     # vitest
+npm run deploy   # deploy to Cloudflare
+```
