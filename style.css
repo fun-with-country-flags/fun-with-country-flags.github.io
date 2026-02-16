@@ -238,6 +238,31 @@ body.dark .floating-emoji {
   font-style: italic;
 }
 
+/* ---------- Flag fun fact card ---------- */
+.flag-fact {
+  margin: 1rem auto 0;
+  max-width: 480px;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(168, 85, 247, 0.06);
+  border: 1px solid rgba(168, 85, 247, 0.18);
+  font-size: 0.83rem;
+  color: var(--text-secondary);
+  text-align: left;
+  line-height: 1.55;
+  animation: slideUp 0.4s ease-out;
+}
+
+.flag-fact-flag {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+body.dark .flag-fact {
+  background: rgba(168, 85, 247, 0.08);
+  border-color: rgba(168, 85, 247, 0.22);
+}
+
 /* ---------- Click sparkles ---------- */
 .sparkle {
   position: fixed;
