@@ -292,6 +292,46 @@ const totalRoundsCount = matchesPerRound.length;
 // Start preloading on Windows
 preloadFlags();
 
+// --- Flag fun facts ---
+// Keyed by two-letter country code. Quality over quantity — only genuinely
+// surprising or little-known facts about the flag itself or its symbols.
+const flagFacts = {
+  al: "Albania's double-headed eagle has been a national symbol since the 15th century, adopted by the hero Gjergj Kastrioti (Skanderbeg) who led resistance against the Ottoman Empire.",
+  au: "Australia's flag features the Southern Cross constellation — visible only from the Southern Hemisphere, and used by sailors for navigation long before European settlement.",
+  bd: "Bangladesh's red disc is deliberately placed slightly off-centre: shifted toward the hoist pole so that it appears perfectly centred when the flag is flying in the wind.",
+  br: "The stars on Brazil's flag map the exact night sky over Rio de Janeiro at 8:30 AM on November 15, 1889 — the precise moment the republic was proclaimed.",
+  kh: "Cambodia's flag is one of the very few in the world to depict a building: the ancient temple complex of Angkor Wat, a UNESCO World Heritage site.",
+  ca: "Canada's maple leaf flag was only adopted in 1965, after a fierce national debate. The previous flag featured the British Union Jack and sparked years of controversy.",
+  cy: "Cyprus is one of only two countries whose flag displays a map of its own territory. The other is Kosovo — which shares the same unusual design idea.",
+  dk: "Denmark's Dannebrog is the world's oldest continuously used national flag, dating to 1219 AD. According to legend, it fell from the sky during the Battle of Lyndanisse.",
+  ge: "Georgia's 'Five Cross Flag' is the only national flag in the world to feature five crosses — one large central cross and four smaller crosses in each quadrant.",
+  gr: "Greece's nine blue-and-white stripes represent the nine syllables of 'Ελευθερία ή Θάνατος' — 'Freedom or Death' — the rallying cry of the Greek War of Independence.",
+  in: "India's Ashoka Chakra wheel has exactly 24 spokes, representing the 24 hours of the day — a reminder that the nation should always be moving forward.",
+  jm: "Jamaica's is the only national flag in the world that contains neither red, white, nor blue — the three colours that appear on the vast majority of the world's flags.",
+  jp: "Japan's Hinomaru (Circle of the Sun) is one of the world's simplest and oldest flags — records of it being used in battle date back to at least the 16th century.",
+  kz: "Kazakhstan's flag features a sun with exactly 32 rays above a soaring Steppe Eagle — a bird revered across Central Asian cultures for centuries.",
+  lb: "Lebanon's Cedar of Lebanon tree is mentioned in both the Bible and the Epic of Gilgamesh, one of humanity's oldest texts. It has symbolised the region for over 3,000 years.",
+  mx: "Mexico's eagle devouring a snake depicts the Aztec prophecy that told the Mexica people where to found their capital — the site that became Tenochtitlan, now Mexico City.",
+  nz: "New Zealand and Australia's flags are so similar that the two countries have accidentally flown the wrong flag at each other's official international ceremonies.",
+  no: "The Norwegian flag contains the crosses of Denmark, Sweden, and Finland hidden within its design — earning it the informal title 'mother of Scandinavian flags'.",
+  ph: "The Philippines' flag is uniquely flipped upside-down during wartime: the red stripe moves to the top instead of the blue, signalling the country is at war.",
+  pt: "Portugal's flag features an armillary sphere — a navigational instrument used during the Age of Discovery when Portuguese sailors mapped and sailed to previously uncharted parts of the world.",
+  qa: "Qatar's flag has 9 white points along its serrated maroon edge, representing Qatar as the 9th emirate to sign a truce with Britain in the 19th century.",
+  sa: "Saudi Arabia's flag is never flown at half-mast. Because it bears the Shahada (Islamic declaration of faith), lowering it would be considered disrespectful to the sacred text.",
+  za: "South Africa's flag was adopted in 1994 when apartheid ended. Its bold Y-shape — in green — symbolises the convergence of diverse paths into a single united nation.",
+  ch: "Switzerland and Vatican City are the only two sovereign nations in the world with a square (rather than rectangular) national flag.",
+  gb: "The Union Jack is a composite of three flags: St. George's Cross (England), St. Andrew's Cross (Scotland), and St. Patrick's Cross (Ireland). Wales has no representation.",
+  us: "The 50-star US flag was designed by 17-year-old Robert Heft as a high-school history project. He originally received a B−, but his teacher promised to raise it if Congress accepted the design.",
+  ua: "Ukraine's blue and yellow represent the blue sky above golden wheat fields — honouring the country's role as the historic 'breadbasket of Europe'.",
+  is: "Iceland's flag uses the same design as Norway's but with inverted colours. Blue and white are Iceland's colours, and the red cross echoes the shared Norse heritage.",
+  ng: "Nigeria's green-white-green flag was designed by a 23-year-old student, Michael Taiwo Akinkunmi, who entered a national competition in 1959. He won £100 for his design.",
+  ar: "Argentina's 'Sun of May' has a human face and 32 alternating straight and wavy rays. It references the May Revolution of 1810, when the sun broke through clouds as a good omen.",
+  il: "Israel's flag is modelled on a Jewish prayer shawl (tallit) — the two blue stripes represent its edges, and the Star of David its traditional emblem.",
+  sg: "Singapore's crescent moon and five stars represent a young nation on the rise, with each star symbolising one of five national ideals: democracy, peace, progress, justice, and equality.",
+  ke: "Kenya's flag features a Maasai warrior's shield and two crossed spears — symbolising the defence of freedom, a direct reference to the country's struggle for independence.",
+  tr: "The white crescent and star on Turkey's flag are sometimes said to reflect the moon mirrored in a pool of blood after the Battle of Kosovo in 1389.",
+};
+
 function renderBracket() {
   const container = document.getElementById('bracket');
   if (!container) return;
@@ -463,6 +503,14 @@ function renderMatch() {
   const a = currentRound[matchIndex];
   const b = currentRound[matchIndex + 1];
 
+  // Build fun fact card if either flag has one
+  const facts = [a, b]
+    .filter(f => flagFacts[f.code])
+    .map(f => `<span class="flag-fact-flag">${f.emoji} ${f.name}</span> ${flagFacts[f.code]}`);
+  const factHtml = facts.length > 0
+    ? `<div class="flag-fact">💡 ${facts[0]}</div>`
+    : '';
+
   app.innerHTML = `
     <div class="match">
       <div class="flag-card">
@@ -480,6 +528,7 @@ function renderMatch() {
       </div>
     </div>
     <p class="keyboard-hint">Press, or use ← → arrow keys to select</p>
+    ${factHtml}
   `;
 
   // Show FIGHT flash every few matches for drama (not on the first match)
